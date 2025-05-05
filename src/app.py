@@ -16,15 +16,23 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # Depuração do ambiente
+    logger.info("Iniciando create_app no ambiente: %s", os.getenv('FLASK_ENV', 'unknown'))
+    logger.info("Diretório atual: %s", os.getcwd())
+    logger.info("Variáveis de ambiente disponíveis: %s", list(os.environ.keys()))
+
     # Configura credenciais do Google Cloud
     logger.info("Configurando credenciais do Google Cloud...")
     logger.info(f"GOOGLE_CREDENTIALS_PATH: {Config.GOOGLE_CREDENTIALS_PATH}")
     logger.info(f"GOOGLE_CREDENTIALS_JSON exists: {bool(Config.GOOGLE_CREDENTIALS_JSON)}")
+    logger.info(f"Raw GOOGLE_CREDENTIALS_JSON: {os.getenv('GOOGLE_CREDENTIALS_JSON')[:50] if os.getenv('GOOGLE_CREDENTIALS_JSON') else 'Not set'}...")
 
     if Config.GOOGLE_CREDENTIALS_JSON:
         try:
             # Em produção (Render), cria um arquivo temporário com o JSON
+            logger.info("Tentando parsear GOOGLE_CREDENTIALS_JSON")
             credentials_dict = json.loads(Config.GOOGLE_CREDENTIALS_JSON)
+            logger.info("GOOGLE_CREDENTIALS_JSON parsed successfully")
             with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as temp_file:
                 json.dump(credentials_dict, temp_file)
                 temp_file_path = temp_file.name
@@ -38,6 +46,7 @@ def create_app():
             raise
     else:
         # Em desenvolvimento local, usa o caminho do arquivo
+        logger.info("GOOGLE_CREDENTIALS_JSON não definido, usando arquivo local")
         if not Config.GOOGLE_CREDENTIALS_PATH or not os.path.exists(Config.GOOGLE_CREDENTIALS_PATH):
             logger.error(f"Arquivo de credenciais não encontrado: {Config.GOOGLE_CREDENTIALS_PATH}")
             raise FileNotFoundError(f"Arquivo de credenciais não encontrado: {Config.GOOGLE_CREDENTIALS_PATH}")

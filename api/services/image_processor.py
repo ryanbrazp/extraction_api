@@ -2,7 +2,7 @@
 from google.cloud import vision
 from PIL import Image
 import io
-from src.config.settings import Config
+from api.settings import Config
 
 client = vision.ImageAnnotatorClient()
 

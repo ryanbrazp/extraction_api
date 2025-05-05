@@ -1,7 +1,7 @@
 """Definição dos endpoints da API."""
 from flask import Blueprint, request, jsonify
-from src.services.image_processor import detect_text
-from src.services.text_analyzer import process_text
+from api.services.image_processor import detect_text
+from api.services.text_analyzer import process_text
 
 api_bp = Blueprint("api", __name__)
 

@@ -2,7 +2,7 @@
 from unidecode import unidecode
 import re
 from nltk import tokenize
-from src.data.lexical_filters import stopwords, base_medications
+from api.data.lexical_filters import stopwords, base_medications
 
 def remove_stopwords(words):
     """Remove palavras da lista de stopwords usando compreensão de lista."""

@@ -12,6 +12,10 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Log inicial para confirmar que o módulo foi carregado
+logger.info("Módulo app.py carregado no ambiente: %s", os.getenv('FLASK_ENV', 'unknown'))
+logger.info("Versão do código: 2025-05-05")  # Para identificar o commit
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)

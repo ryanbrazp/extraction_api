@@ -1,4 +1,7 @@
 """Definição dos endpoints da API."""
+import nltk
+nltk.download('punkt', download_dir='/tmp/nltk_data')
+
 from flask import Blueprint, request, jsonify
 from api.services.image_processor import detect_text
 from api.services.text_analyzer import process_text

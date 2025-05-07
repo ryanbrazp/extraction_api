@@ -1,7 +1,5 @@
 """Inicialização do aplicativo Flask."""
 import os
-import json
-import tempfile
 import logging
 from flask import Flask
 from api.routes import api_bp
@@ -30,28 +28,15 @@ app.register_error_handler(500, handle_server_error)
 
 # Configura credenciais do Google Cloud
 logger.info("Configurando credenciais do Google Cloud...")
-logger.info(f"GOOGLE_CREDENTIALS_JSON exists: {bool(os.getenv('GOOGLE_CREDENTIALS_JSON'))}")
-logger.info(f"Raw GOOGLE_CREDENTIALS_JSON: {os.getenv('GOOGLE_CREDENTIALS_JSON')[:50] if os.getenv('GOOGLE_CREDENTIALS_JSON') else 'Not set'}...")
+credentials_path = '/app/key.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
 
-if os.getenv('GOOGLE_CREDENTIALS_JSON'):
-    try:
-        logger.info("Tentando parsear GOOGLE_CREDENTIALS_JSON")
-        credentials_dict = json.loads(os.getenv('GOOGLE_CREDENTIALS_JSON'))
-        logger.info("GOOGLE_CREDENTIALS_JSON parsed successfully")
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as temp_file:
-            json.dump(credentials_dict, temp_file)
-            temp_file_path = temp_file.name
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = temp_file_path
-        logger.info(f"Arquivo temporário de credenciais criado em: {temp_file_path}")
-    except json.JSONDecodeError as e:
-        logger.error(f"Erro ao parsear GOOGLE_CREDENTIALS_JSON: {e}")
-        raise
-    except Exception as e:
-        logger.error(f"Erro ao configurar credenciais: {e}")
-        raise
+# Verifica se o arquivo de credenciais existe
+if not os.path.exists(credentials_path):
+    logger.error(f"Arquivo de credenciais não encontrado em: {credentials_path}")
+    raise FileNotFoundError(f"Arquivo de credenciais não encontrado em: {credentials_path}")
 else:
-    logger.error("GOOGLE_CREDENTIALS_JSON não encontrado")
-    raise FileNotFoundError("GOOGLE_CREDENTIALS_JSON não encontrado")
+    logger.info(f"Arquivo de credenciais encontrado em: {credentials_path}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
